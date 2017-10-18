@@ -1,0 +1,61 @@
+#!/bin/bash
+
+IPTABLES_D=/etc/iptables.d
+
+[[ -d $IPTABLES_D ]] || exit 0
+
+function iptables_exec {
+    export ACTION=$1
+    for f in `ls -1 $IPTABLES_D`; do
+        if [[ ${VERBOSE^^} == YES || ${VERBOSE^^} == TRUE ]]; then
+            echo Processing $f
+        fi
+        if [[ $f =~ ^.*\.ipv6$ ]]; then
+            IPTABLES=ip6tables
+        elif [[ $f =~ ^.*\.ipv4$ ]]; then
+            IPTABLES=iptables
+        else
+            continue
+        fi
+        while read l; do
+            cmd="$IPTABLES $(eval echo $l)"
+            if [[ ${VERBOSE^^} == YES || ${VERBOSE^^} == TRUE ]]; then
+                echo $cmd
+            else
+                cmd="$cmd 2>/dev/null"
+            fi
+            eval $cmd
+        done <$IPTABLES_D/$f
+    done
+}
+
+function iptables_start {
+    iptables_exec '-A'
+    iptables -P INPUT DROP
+    ip6tables -P INPUT DROP
+}
+
+function iptables_stop {
+    iptables -P INPUT ACCEPT
+    ip6tables -P INPUT ACCEPT
+    iptables_exec '-D'
+}
+
+case "$1" in
+start)
+    iptables_start
+    ;;
+stop)
+    iptables_stop
+    ;;
+restart)
+    iptables_stop
+    iptables_start
+    ;;
+*)
+    echo "Usage: $0 {start|stop|restart}"
+    exit 1
+    ;;
+esac
+
+exit 0
