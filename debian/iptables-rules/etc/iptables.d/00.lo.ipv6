@@ -1,0 +1,1 @@
+${ACTION} INPUT -i lo -j ACCEPT

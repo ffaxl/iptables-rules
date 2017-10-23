@@ -1,0 +1,9 @@
+# Defaults for iptables-rules initscript
+# sourced by /etc/init.d/iptables-rules
+# installed at /etc/default/iptables-rules by the maintainer scripts
+
+#
+# This is a POSIX shell fragment
+#
+
+VERBOSE=yes

@@ -1,0 +1,14 @@
+Source: iptables-rules
+Section: net
+Priority: extra
+Maintainer: Evgeniy Slizevich <evgeniy@slizevich.net>
+Build-Depends: debhelper (>=9), dh-systemd
+Standards-Version: 3.9.6
+Homepage: https://github.com/ffaxl/iptables-rules
+#Vcs-Git: https://github.com/ffaxl/iptables-rules.git
+
+Package: iptables-rules
+Architecture: all
+Depends: ${misc:Depends}, iptables, ipset
+Description: iptables rules & ipset loader
+ It loads iptables rules and ipsets from iptables.d directory.

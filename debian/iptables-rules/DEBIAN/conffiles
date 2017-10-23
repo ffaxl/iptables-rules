@@ -1,0 +1,9 @@
+/etc/default/iptables-rules
+/etc/iptables.d/00.lo.ipv4
+/etc/iptables.d/00.lo.ipv6
+/etc/iptables.d/10.established.ipv4
+/etc/iptables.d/10.established.ipv6
+/etc/iptables.d/10.icmp.ipv4
+/etc/iptables.d/10.icmp.ipv6
+/etc/iptables.d/20.sshd.ipv4
+/etc/iptables.d/20.sshd.ipv6
