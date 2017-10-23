@@ -1,1 +1,1 @@
-${ACTION} INPUT -i lo -j ACCEPT
+INPUT -i lo -j ACCEPT

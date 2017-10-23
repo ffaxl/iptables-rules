@@ -1,44 +1,94 @@
 #!/bin/bash
 
-IPTABLES_D=/etc/iptables.d
-
+IPTABLES_D_STARTED=/var/lib/iptables.d
+IPTABLES_D=${IPTABLES_D:-/etc/iptables.d}
 [[ -d $IPTABLES_D ]] || exit 0
 
-function iptables_exec {
-    export ACTION=$1
-    for f in `ls -1 $IPTABLES_D`; do
-        if [[ ${VERBOSE^^} == YES || ${VERBOSE^^} == TRUE ]]; then
-            echo Processing $f
-        fi
-        if [[ $f =~ ^.*\.ipv6$ ]]; then
-            IPTABLES=ip6tables
-        elif [[ $f =~ ^.*\.ipv4$ ]]; then
-            IPTABLES=iptables
-        else
-            continue
-        fi
-        while read l; do
-            cmd="$IPTABLES $(eval echo $l)"
-            if [[ ${VERBOSE^^} == YES || ${VERBOSE^^} == TRUE ]]; then
-                echo $cmd
-            else
-                cmd="$cmd 2>/dev/null"
-            fi
-            eval $cmd
-        done <$IPTABLES_D/$f
-    done
+function process_iptables {
+    fname=$1
+    action=$2
+    iptables=$3
+    [[ ${VERBOSE^^} == YES || ${VERBOSE^^} == TRUE ]] && echo Processing $fname
+    while read l; do
+        cmd="$iptables $action $l"
+        [[ ${VERBOSE^^} == YES || ${VERBOSE^^} == TRUE ]] && echo $cmd
+        eval $cmd
+    done <$fname
 }
 
-function iptables_start {
-    iptables_exec '-A'
-    iptables -P INPUT DROP
-    ip6tables -P INPUT DROP
+function process_ipset {
+    fname=$1
+    action=$2
+    ipset=
+    [[ ${VERBOSE^^} == YES || ${VERBOSE^^} == TRUE ]] && echo Processing $fname
+    while read l; do
+        if [[ -z $ipset ]]; then
+            ipset=`echo $l | cut -d" " -f1`
+            if [[ $action == add ]]; then
+                cmd="ipset create $l"
+            else
+                cmd="ipset destroy $ipset"
+            fi
+        else
+            cmd="ipset add $ipset $l"
+        fi
+        [[ ${VERBOSE^^} == YES || ${VERBOSE^^} == TRUE ]] && echo $cmd
+        eval $cmd
+        [[ $action == del ]] && return
+    done <$fname
 }
 
 function iptables_stop {
     iptables -P INPUT ACCEPT
+    iptables -P FORWARD ACCEPT
     ip6tables -P INPUT ACCEPT
-    iptables_exec '-D'
+    ip6tables -P FORWARD ACCEPT
+
+    # if not started
+    [[ ! -d $IPTABLES_D_STARTED ]] && return
+
+    for f in `ls -1 $IPTABLES_D_STARTED/*.ipv6`; do
+        process_iptables "$f" "-D" "ip6tables"
+        rm "$f"
+    done
+
+    for f in `ls -1 $IPTABLES_D_STARTED/*.ipv4`; do
+        process_iptables "$f" "-D" "iptables"
+        rm "$f"
+    done
+
+    for f in `ls -1 $IPTABLES_D_STARTED/*.ipset`; do
+        process_ipset "$f" "del"
+        rm "$f"
+    done
+
+    rm -rf $IPTABLES_D_STARTED
+}
+
+function iptables_start {
+    # if started (maybe)
+    [[ -d $IPTABLES_D_STARTED ]] && iptables_stop
+    mkdir "$IPTABLES_D_STARTED"
+
+    for f in `ls -1 $IPTABLES_D/*.ipset`; do
+        process_ipset "$f" "add"
+        cp "$f" "$IPTABLES_D_STARTED"
+    done
+
+    for f in `ls -1 $IPTABLES_D/*.ipv6`; do
+        process_iptables "$f" "-A" "ip6tables"
+        cp "$f" "$IPTABLES_D_STARTED"
+    done
+
+    for f in `ls -1 $IPTABLES_D/*.ipv4`; do
+        process_iptables "$f" "-A" "iptables"
+        cp "$f" "$IPTABLES_D_STARTED"
+    done
+
+    iptables -P INPUT DROP
+    iptables -P FORWARD DROP
+    ip6tables -P INPUT DROP
+    ip6tables -P FORWARD DROP
 }
 
 case "$1" in

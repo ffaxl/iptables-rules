@@ -1,0 +1,1 @@
+INPUT -m set --match-set local src -m conntrack --ctstate NEW -j ACCEPT
