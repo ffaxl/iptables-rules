@@ -1,0 +1,4 @@
+c1ac3391a3f585e23e24e29bae959fab  lib/systemd/system/iptables-rules.service
+f8908b854a0699c13764f1747786b44a  usr/sbin/iptables-rules
+be840a9b95b6f33f85bf61257957408d  usr/share/doc/iptables-rules/changelog.gz
+b067513758b378df936d27bf9dbda72c  usr/share/doc/iptables-rules/copyright

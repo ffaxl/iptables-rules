@@ -1,0 +1,1 @@
+${ACTION} INPUT -p ipv6-icmp -j ACCEPT
