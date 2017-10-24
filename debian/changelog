@@ -1,6 +1,7 @@
-iptables-rules (0.1.1) UNRELEASED; urgency=medium
+iptables-rules (0.1.2) UNRELEASED; urgency=medium
 
   * Pre-release
   * ipset added 
+  * established in forward 
 
- -- Evgeniy Slizevich <evgeniy@slizevich.net>  Mon, 23 Oct 2017 21:19:25 +0000
+ -- Evgeniy Slizevich <evgeniy@slizevich.net>  Tue, 24 Oct 2017 08:29:17 +0000

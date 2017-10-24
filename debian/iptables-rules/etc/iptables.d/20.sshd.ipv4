@@ -1,1 +1,0 @@
-${ACTION} INPUT -p tcp -m tcp --dport 22 -m conntrack --ctstate NEW -j ACCEPT

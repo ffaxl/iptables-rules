@@ -1,9 +1,0 @@
-[Unit]
-Description=IPTables rules loader
-
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-EnvironmentFile=-/etc/default/iptables-rules
-ExecStart=/usr/sbin/iptables-rules start
-ExecStop=/usr/sbin/iptables-rules stop
