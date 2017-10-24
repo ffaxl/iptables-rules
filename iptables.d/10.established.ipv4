@@ -1,1 +1,2 @@
 INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
