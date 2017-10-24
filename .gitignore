@@ -1,0 +1,4 @@
+debian/debhelper-build-stamp
+debian/files
+debian/iptables-rules.debhelper.log
+debian/iptables-rules
